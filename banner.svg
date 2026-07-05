@@ -1,0 +1,70 @@
+<svg viewBox="0 0 1200 260" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#08090c"/>
+      <stop offset="100%" stop-color="#111318"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="12%" cy="15%" r="55%">
+      <stop offset="0%" stop-color="#f2b84b" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#f2b84b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="92%" cy="95%" r="50%">
+      <stop offset="0%" stop-color="#f2b84b" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#f2b84b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f9d68a"/>
+      <stop offset="100%" stop-color="#d99a2b"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="260" fill="url(#bg)"/>
+  <rect width="1200" height="260" fill="url(#glow1)"/>
+  <rect width="1200" height="260" fill="url(#glow2)"/>
+
+  <!-- faint contribution-grid pattern -->
+  <g opacity="0.5">
+    <g fill="#1a1c22">
+      <rect x="900" y="30" width="10" height="10" rx="2"/>
+      <rect x="916" y="30" width="10" height="10" rx="2"/>
+      <rect x="932" y="30" width="10" height="10" rx="2"/>
+      <rect x="948" y="30" width="10" height="10" rx="2"/>
+      <rect x="964" y="30" width="10" height="10" rx="2"/>
+      <rect x="900" y="46" width="10" height="10" rx="2"/>
+      <rect x="916" y="46" width="10" height="10" rx="2"/>
+      <rect x="932" y="46" width="10" height="10" rx="2"/>
+      <rect x="948" y="46" width="10" height="10" rx="2"/>
+      <rect x="964" y="46" width="10" height="10" rx="2"/>
+      <rect x="900" y="62" width="10" height="10" rx="2"/>
+      <rect x="916" y="62" width="10" height="10" rx="2"/>
+      <rect x="932" y="62" width="10" height="10" rx="2"/>
+      <rect x="948" y="62" width="10" height="10" rx="2"/>
+      <rect x="964" y="62" width="10" height="10" rx="2"/>
+    </g>
+    <g fill="#f2b84b" fill-opacity="0.55">
+      <rect x="916" y="30" width="10" height="10" rx="2"/>
+      <rect x="948" y="46" width="10" height="10" rx="2"/>
+      <rect x="932" y="62" width="10" height="10" rx="2"/>
+      <rect x="964" y="30" width="10" height="10" rx="2"/>
+    </g>
+    <g fill="#f2b84b" fill-opacity="0.3">
+      <rect x="900" y="62" width="10" height="10" rx="2"/>
+      <rect x="932" y="30" width="10" height="10" rx="2"/>
+      <rect x="948" y="62" width="10" height="10" rx="2"/>
+    </g>
+  </g>
+
+  <!-- magnifier / search mark -->
+  <g transform="translate(110,130)">
+    <circle r="26" fill="none" stroke="#f2b84b" stroke-width="4.5"/>
+    <line x1="19" y1="19" x2="38" y2="38" stroke="#f2b84b" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- title -->
+  <text x="170" y="118" font-family="'JetBrains Mono', Consolas, monospace" font-size="52" font-weight="700" fill="url(#goldText)">git://find</text>
+  <text x="172" y="152" font-family="Arial, sans-serif" font-size="19" fill="#8b8d99">Look up any GitHub profile, instantly.</text>
+
+  <line x1="172" y1="172" x2="600" y2="172" stroke="#f2b84b" stroke-width="1.5" opacity="0.5"/>
+
+  <text x="172" y="200" font-family="'JetBrains Mono', Consolas, monospace" font-size="13" fill="#565a68">$ find octocat</text>
+</svg>

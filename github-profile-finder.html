@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>git://find — GitHub Profile Finder</title>
+    <meta name="description" content="Look up any GitHub user by handle." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0e14;
+        --surface: #10161f;
+        --surface-2: #161d29;
+        --line: rgba(230, 237, 243, 0.09);
+        --text: #e6edf3;
+        --muted: #7b8794;
+        --green: #39ff88;
+        --green-dim: rgba(57, 255, 136, 0.14);
+        --red: #ff5c5c;
+        --red-dim: rgba(255, 92, 92, 0.14);
+        --amber: #ffb86b;
+        --mono: "JetBrains Mono", monospace;
+        --body: "Inter", sans-serif;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+      a {
+        color: inherit;
+      }
+      ::selection {
+        background: var(--green);
+        color: #04140a;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      a:focus-visible {
+        outline: 2px solid var(--green);
+        outline-offset: 2px;
+      }
+
+      /* ---------- Ambient contribution-grid background ---------- */
+      #grid-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 14px);
+        grid-auto-rows: 14px;
+        gap: 4px;
+        padding: 20px;
+        opacity: 0.5;
+        pointer-events: none;
+        mask-image: radial-gradient(
+          ellipse 90% 70% at 50% 20%,
+          black 20%,
+          transparent 85%
+        );
+        -webkit-mask-image: radial-gradient(
+          ellipse 90% 70% at 50% 20%,
+          black 20%,
+          transparent 85%
+        );
+      }
+      #grid-bg .sq {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        background: var(--surface-2);
+      }
+
+      /* ---------- Layout ---------- */
+      .page {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        padding: 28px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 0.3px;
+      }
+      .brand .prompt {
+        color: var(--green);
+      }
+      .brand .caret {
+        display: inline-block;
+        width: 8px;
+        height: 16px;
+        background: var(--green);
+        animation: blink 1.1s steps(1) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+      .badge {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        padding: 6px 12px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .badge .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 8px 1px var(--green);
+      }
+
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px 80px;
+      }
+
+      .intro {
+        text-align: center;
+        max-width: 640px;
+        margin-bottom: 44px;
+      }
+      .intro .tag {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--green);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 18px;
+        display: block;
+      }
+      .intro h1 {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: clamp(30px, 5vw, 48px);
+        letter-spacing: -1px;
+        line-height: 1.15;
+        margin-bottom: 16px;
+      }
+      .intro h1 .accent {
+        color: var(--green);
+      }
+      .intro p {
+        color: var(--muted);
+        font-size: 15.5px;
+      }
+
+      /* ---------- Terminal search ---------- */
+      .terminal {
+        width: 100%;
+        max-width: 620px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+      }
+      .term-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--line);
+      }
+      .term-bar .tl {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .tl.r {
+        background: #ff5f57;
+      }
+      .tl.y {
+        background: #febc2e;
+      }
+      .tl.g {
+        background: #28c840;
+      }
+      .term-bar .path {
+        margin-left: 10px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .term-body {
+        padding: 22px 18px;
+      }
+      form.search-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--mono);
+        font-size: 15px;
+      }
+      form.search-row .prompt-sym {
+        color: var(--green);
+        flex-shrink: 0;
+      }
+      form.search-row .prefix {
+        color: var(--muted);
+        flex-shrink: 0;
+      }
+      #username {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 15px;
+        caret-color: var(--green);
+      }
+      #username::placeholder {
+        color: #4a5568;
+      }
+      #username:focus {
+        outline: none;
+      }
+      .go-btn {
+        font-family: var(--mono);
+        font-weight: 600;
+        font-size: 13px;
+        background: var(--green);
+        color: #04140a;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        flex-shrink: 0;
+      }
+      .go-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px -10px var(--green);
+      }
+      .go-btn:active {
+        transform: translateY(0);
+      }
+      .go-btn:disabled {
+        opacity: 0.5;
+        cursor: progress;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .hint-row {
+        margin-top: 14px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        padding: 6px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: transparent;
+      }
+      .chip:hover {
+        color: var(--green);
+        border-color: var(--green);
+      }
+
+      /* ---------- Status / error ---------- */
+      .status {
+        margin-top: 18px;
+        font-family: var(--mono);
+        font-size: 13px;
+        display: none;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        max-width: 620px;
+      }
+      .status.show {
+        display: flex;
+      }
+      .status.err {
+        color: var(--red);
+      }
+      .status.load {
+        color: var(--muted);
+      }
+      .spinner {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid var(--line);
+        border-top-color: var(--green);
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ---------- Result card ---------- */
+      #result {
+        width: 100%;
+        max-width: 720px;
+        margin-top: 40px;
+        opacity: 0;
+        transform: translateY(16px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease;
+      }
+      #result.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .profile-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .diff-strip {
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--red),
+          var(--amber),
+          var(--green)
+        );
+      }
+
+      .profile-top {
+        display: flex;
+        gap: 22px;
+        padding: 28px;
+        border-bottom: 1px solid var(--line);
+      }
+      .avatar-wrap {
+        position: relative;
+        flex-shrink: 0;
+      }
+      .avatar-wrap img {
+        width: 96px;
+        height: 96px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+        object-fit: cover;
+      }
+      .avatar-wrap .pulse {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--green);
+        border: 3px solid var(--surface);
+      }
+      .profile-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .profile-info .name-row {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .profile-info h2 {
+        font-family: var(--mono);
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .profile-info .login {
+        color: var(--green);
+        font-family: var(--mono);
+        font-size: 14px;
+      }
+      .profile-info .bio {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 14.5px;
+        line-height: 1.5;
+      }
+      .meta-row {
+        margin-top: 14px;
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .meta-row span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .profile-link {
+        margin-top: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text);
+        border: 1px solid var(--line);
+        padding: 8px 14px;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+      .profile-link:hover {
+        border-color: var(--green);
+        color: var(--green);
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .stat-cell {
+        padding: 22px 24px;
+        border-right: 1px solid var(--line);
+        position: relative;
+      }
+      .stat-cell:last-child {
+        border-right: none;
+      }
+      .stat-cell .stat-label {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .stat-cell .stat-value {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 30px;
+        margin-top: 8px;
+      }
+      .stat-cell .bar-track {
+        margin-top: 12px;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--surface-2);
+        overflow: hidden;
+      }
+      .stat-cell .bar-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 2px;
+        transition: width 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .stat-cell.repos .bar-fill {
+        background: var(--green);
+      }
+      .stat-cell.followers .bar-fill {
+        background: var(--amber);
+      }
+      .stat-cell.following .bar-fill {
+        background: var(--red);
+      }
+
+      footer {
+        text-align: center;
+        padding: 26px;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        border-top: 1px solid var(--line);
+      }
+
+      @media (max-width: 560px) {
+        .profile-top {
+          flex-direction: column;
+        }
+        .stat-grid {
+          grid-template-columns: 1fr;
+        }
+        .stat-cell {
+          border-right: none;
+          border-bottom: 1px solid var(--line);
+        }
+        .stat-cell:last-child {
+          border-bottom: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="grid-bg"></div>
+
+    <div class="page">
+      <header>
+        <div class="brand">
+          <span class="prompt">git@find</span>:~$<span class="caret"></span>
+        </div>
+        <div class="badge"><span class="dot"></span>GitHub REST API · live</div>
+      </header>
+
+      <main>
+        <div class="intro">
+          <span class="tag">Profile Lookup</span>
+          <h1>
+            Find any dev on <span class="accent">GitHub</span>, instantly.
+          </h1>
+          <p>
+            Type a username. We'll pull their avatar, bio, and stats straight
+            from the source.
+          </p>
+        </div>
+
+        <div class="terminal">
+          <div class="term-bar">
+            <span class="tl r"></span><span class="tl y"></span
+            ><span class="tl g"></span>
+            <span class="path">~/find-user</span>
+          </div>
+          <div class="term-body">
+            <form class="search-row" id="searchForm">
+              <span class="prompt-sym">➜</span>
+              <span class="prefix">find</span>
+              <input
+                id="username"
+                type="text"
+                placeholder="octocat"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button class="go-btn" type="submit" id="goBtn">run ↵</button>
+            </form>
+            <div class="hint-row">
+              <button type="button" class="chip" data-user="TheReal-Diego ">
+                TheReal-Diego
+              </button>
+              <!-- <button type="button" class="chip" data-user="gaearon">
+                gaearon
+              </button>
+              <button type="button" class="chip" data-user="octocat">
+                octocat
+              </button>
+              <button type="button" class="chip" data-user="sindresorhus">
+                sindresorhus
+              </button> -->
+            </div>
+          </div>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div id="result"></div>
+      </main>
+
+      <footer>
+        <!-- find-user · built on the public GitHub REST API · unauthenticated
+        requests are rate-limited -->
+      </footer>
+    </div>
+
+    <script>
+      // ---------- Ambient contribution grid ----------
+      const gridBg = document.getElementById("grid-bg");
+      const cols = Math.ceil(window.innerWidth / 18);
+      const rows = Math.ceil(window.innerHeight / 18);
+      const total = Math.min(cols * rows, 900);
+      const squares = [];
+      for (let i = 0; i < total; i++) {
+        const sq = document.createElement("div");
+        sq.className = "sq";
+        gridBg.appendChild(sq);
+        squares.push(sq);
+      }
+      const shades = [
+        "rgba(57,255,136,0.06)",
+        "rgba(57,255,136,0.14)",
+        "rgba(57,255,136,0.28)",
+        "rgba(57,255,136,0.45)",
+      ];
+      const reduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      function litUp() {
+        if (!squares.length) return;
+        const n = Math.floor(squares.length * 0.03);
+        for (let i = 0; i < n; i++) {
+          const sq = squares[Math.floor(Math.random() * squares.length)];
+          const shade = shades[Math.floor(Math.random() * shades.length)];
+          sq.style.transition = "background 1.8s ease";
+          sq.style.background = shade;
+          setTimeout(() => {
+            sq.style.background = "var(--surface-2)";
+          }, 2200);
+        }
+      }
+      if (!reduced) {
+        setInterval(litUp, 350);
+        litUp();
+      }
+
+      // ---------- Search logic ----------
+      const form = document.getElementById("searchForm");
+      const input = document.getElementById("username");
+      const goBtn = document.getElementById("goBtn");
+      const statusEl = document.getElementById("status");
+      const resultEl = document.getElementById("result");
+
+      document.querySelectorAll(".chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          input.value = chip.dataset.user;
+          form.requestSubmit();
+        });
+      });
+
+      function setStatus(kind, text) {
+        statusEl.className = "status show " + (kind || "");
+        if (kind === "load") {
+          statusEl.innerHTML = '<span class="spinner"></span>' + text;
+        } else {
+          statusEl.innerHTML = text;
+        }
+      }
+      function clearStatus() {
+        statusEl.className = "status";
+        statusEl.innerHTML = "";
+      }
+
+      function fmt(n) {
+        if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+        return n.toString();
+      }
+
+      function esc(str) {
+        const d = document.createElement("div");
+        d.textContent = str || "";
+        return d.innerHTML;
+      }
+
+      async function lookup(username) {
+        resultEl.classList.remove("show");
+        resultEl.innerHTML = "";
+        setStatus("load", "resolving " + username + " …");
+        goBtn.disabled = true;
+
+        try {
+          const res = await fetch(
+            "https://api.github.com/users/" + encodeURIComponent(username),
+          );
+          if (res.status === 404) {
+            setStatus(
+              "err",
+              'error: user "' + esc(username) + '" not found (404)',
+            );
+            goBtn.disabled = false;
+            return;
+          }
+          if (res.status === 403) {
+            setStatus("err", "error: rate limit hit — try again in a minute");
+            goBtn.disabled = false;
+            return;
+          }
+          if (!res.ok) {
+            setStatus("err", "error: request failed (" + res.status + ")");
+            goBtn.disabled = false;
+            return;
+          }
+          const data = await res.json();
+          clearStatus();
+          renderProfile(data);
+        } catch (err) {
+          setStatus("err", "error: network request failed");
+        } finally {
+          goBtn.disabled = false;
+        }
+      }
+
+      function renderProfile(u) {
+        const joined = new Date(u.created_at).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+        });
+        resultEl.innerHTML = `
+      <div class="profile-card">
+        <div class="diff-strip"></div>
+        <div class="profile-top">
+          <div class="avatar-wrap">
+            <img src="${u.avatar_url}" alt="${esc(u.login)} avatar" />
+            <div class="pulse"></div>
+          </div>
+          <div class="profile-info">
+            <div class="name-row">
+              <h2>${esc(u.name || u.login)}</h2>
+              <span class="login">@${esc(u.login)}</span>
+            </div>
+            <p class="bio">${u.bio ? esc(u.bio) : "No bio provided."}</p>
+            <div class="meta-row">
+              ${u.location ? `<span>📍 ${esc(u.location)}</span>` : ""}
+              ${u.company ? `<span>🏢 ${esc(u.company)}</span>` : ""}
+              <span>🗓 joined ${joined}</span>
+            </div>
+            <a class="profile-link" href="${u.html_url}" target="_blank" rel="noopener noreferrer">view on github.com ↗</a>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-cell repos">
+            <div class="stat-label">Repositories</div>
+            <div class="stat-value">${fmt(u.public_repos)}</div>
+            <div class="bar-track"><div class="bar-fill" data-target="${Math.min(100, u.public_repos)}"></div></div>
+          </div>
+          <div class="stat-cell followers">
+            <div class="stat-label">Followers</div>
+            <div class="stat-value">${fmt(u.followers)}</div>
+            <div class="bar-track"><div class="bar-fill" data-target="${Math.min(100, u.followers)}"></div></div>
+          </div>
+          <div class="stat-cell following">
+            <div class="stat-label">Following</div>
+            <div class="stat-value">${fmt(u.following)}</div>
+            <div class="bar-track"><div class="bar-fill" data-target="${Math.min(100, u.following)}"></div></div>
+          </div>
+        </div>
+      </div>
+    `;
+        requestAnimationFrame(() => {
+          resultEl.classList.add("show");
+          resultEl.querySelectorAll(".bar-fill").forEach((bar) => {
+            const t = parseFloat(bar.dataset.target) || 0;
+            setTimeout(() => {
+              bar.style.width = Math.max(t, 4) + "%";
+            }, 150);
+          });
+        });
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const val = input.value.trim();
+        if (!val) {
+          setStatus("err", "error: enter a username first");
+          return;
+        }
+        lookup(val);
+      });
+    </script>
+  </body>
+</html>

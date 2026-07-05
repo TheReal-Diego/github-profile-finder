@@ -1,0 +1,98 @@
+<svg viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="mask" cx="50%" cy="18%" r="70%">
+      <stop offset="0%" stop-color="#161d29"/>
+      <stop offset="100%" stop-color="#0a0e14"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="760" fill="#0a0e14"/>
+
+  <!-- ambient contribution grid -->
+  <g opacity="0.35">
+    <g fill="#161d29">
+      <!-- sparse grid of squares -->
+      <rect x="40" y="40" width="12" height="12" rx="3"/><rect x="60" y="40" width="12" height="12" rx="3"/><rect x="80" y="40" width="12" height="12" rx="3"/><rect x="100" y="40" width="12" height="12" rx="3"/><rect x="120" y="40" width="12" height="12" rx="3"/><rect x="140" y="40" width="12" height="12" rx="3"/>
+      <rect x="40" y="60" width="12" height="12" rx="3"/><rect x="60" y="60" width="12" height="12" rx="3"/><rect x="80" y="60" width="12" height="12" rx="3"/><rect x="100" y="60" width="12" height="12" rx="3"/><rect x="120" y="60" width="12" height="12" rx="3"/><rect x="140" y="60" width="12" height="12" rx="3"/>
+      <rect x="1040" y="40" width="12" height="12" rx="3"/><rect x="1060" y="40" width="12" height="12" rx="3"/><rect x="1080" y="40" width="12" height="12" rx="3"/><rect x="1100" y="40" width="12" height="12" rx="3"/><rect x="1120" y="40" width="12" height="12" rx="3"/><rect x="1140" y="40" width="12" height="12" rx="3"/>
+      <rect x="1040" y="60" width="12" height="12" rx="3"/><rect x="1060" y="60" width="12" height="12" rx="3"/><rect x="1080" y="60" width="12" height="12" rx="3"/><rect x="1100" y="60" width="12" height="12" rx="3"/><rect x="1120" y="60" width="12" height="12" rx="3"/><rect x="1140" y="60" width="12" height="12" rx="3"/>
+    </g>
+    <g fill="#39ff88" fill-opacity="0.35">
+      <rect x="60" y="40" width="12" height="12" rx="3"/><rect x="100" y="60" width="12" height="12" rx="3"/><rect x="1080" y="40" width="12" height="12" rx="3"/><rect x="1120" y="60" width="12" height="12" rx="3"/>
+    </g>
+  </g>
+
+  <!-- header -->
+  <g font-family="'JetBrains Mono', monospace">
+    <text x="48" y="55" font-size="16" font-weight="700" fill="#e6edf3">git@find<tspan fill="#7b8794">:~$</tspan></text>
+    <rect x="1000" y="34" width="152" height="28" rx="14" fill="none" stroke="#2a3038"/>
+    <circle cx="1018" cy="48" r="3.5" fill="#39ff88"/>
+    <text x="1030" y="52" font-size="10" fill="#7b8794">GitHub REST API · live</text>
+  </g>
+
+  <!-- intro -->
+  <g text-anchor="middle" font-family="Arial">
+    <text x="600" y="140" font-family="'JetBrains Mono', monospace" font-size="11" fill="#39ff88" letter-spacing="2">PROFILE LOOKUP</text>
+    <text x="600" y="180" font-family="'JetBrains Mono', monospace" font-size="34" font-weight="700" fill="#e6edf3">Find any dev on <tspan fill="#39ff88">GitHub</tspan>, instantly.</text>
+    <text x="600" y="208" font-size="15" fill="#7b8794">Type a username. We'll pull their avatar, bio, and stats straight from the source.</text>
+  </g>
+
+  <!-- terminal -->
+  <g>
+    <rect x="300" y="240" width="600" height="120" rx="12" fill="#10161f" stroke="#1c222c"/>
+    <rect x="300" y="240" width="600" height="34" rx="12" fill="#161d29"/>
+    <circle cx="322" cy="257" r="5" fill="#ff5f57"/>
+    <circle cx="340" cy="257" r="5" fill="#febc2e"/>
+    <circle cx="358" cy="257" r="5" fill="#28c840"/>
+    <text x="380" y="261" font-family="'JetBrains Mono', monospace" font-size="11" fill="#7b8794">~/find-user</text>
+
+    <text x="322" y="310" font-family="'JetBrains Mono', monospace" font-size="15" fill="#39ff88">➜</text>
+    <text x="342" y="310" font-family="'JetBrains Mono', monospace" font-size="15" fill="#7b8794">find</text>
+    <text x="382" y="310" font-family="'JetBrains Mono', monospace" font-size="15" fill="#e6edf3">octocat</text>
+    <rect x="800" y="292" width="76" height="30" rx="8" fill="#39ff88"/>
+    <text x="838" y="312" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#04140a" text-anchor="middle">run ↵</text>
+
+    <rect x="322" y="332" width="90" height="20" rx="10" fill="none" stroke="#2a3038"/>
+    <text x="367" y="346" font-family="'JetBrains Mono', monospace" font-size="10" fill="#7b8794" text-anchor="middle">TheReal-Diego</text>
+  </g>
+
+  <!-- result profile card -->
+  <g>
+    <rect x="300" y="392" width="600" height="330" rx="16" fill="#10161f" stroke="#1c222c"/>
+    <rect x="300" y="392" width="600" height="4" fill="#39ff88" fill-opacity="0.6"/>
+
+    <!-- avatar -->
+    <circle cx="368" cy="450" r="34" fill="#161d29" stroke="#39ff88" stroke-width="2"/>
+    <circle cx="368" cy="450" r="34" fill="none" stroke="#39ff88" stroke-opacity="0.3" stroke-width="8"/>
+
+    <text x="418" y="440" font-family="Arial" font-size="19" font-weight="700" fill="#e6edf3">The Octocat</text>
+    <text x="418" y="440" font-family="'JetBrains Mono', monospace" font-size="12" fill="#7b8794" dx="140">@octocat</text>
+    <text x="418" y="463" font-family="Arial" font-size="13" fill="#7b8794">GitHub's mascot and friendliest bit of test data.</text>
+    <text x="418" y="486" font-family="Arial" font-size="12" fill="#7b8794">📍 San Francisco &#160;&#160; 🏢 GitHub &#160;&#160; 🗓 joined Jan 2011</text>
+    <text x="418" y="508" font-family="'JetBrains Mono', monospace" font-size="12" fill="#39ff88">view on github.com ↗</text>
+
+    <line x1="322" y1="540" x2="878" y2="540" stroke="#1c222c"/>
+
+    <!-- stat grid -->
+    <g font-family="Arial">
+      <text x="410" y="575" font-size="11" fill="#7b8794" text-anchor="middle">REPOSITORIES</text>
+      <text x="410" y="605" font-size="26" font-weight="700" fill="#e6edf3" text-anchor="middle">8</text>
+      <rect x="345" y="618" width="130" height="4" rx="2" fill="#1c222c"/>
+      <rect x="345" y="618" width="90" height="4" rx="2" fill="#39ff88"/>
+
+      <line x1="510" y1="560" x2="510" y2="630" stroke="#1c222c"/>
+
+      <text x="600" y="575" font-size="11" fill="#7b8794" text-anchor="middle">FOLLOWERS</text>
+      <text x="600" y="605" font-size="26" font-weight="700" fill="#e6edf3" text-anchor="middle">14.2k</text>
+      <rect x="535" y="618" width="130" height="4" rx="2" fill="#1c222c"/>
+      <rect x="535" y="618" width="120" height="4" rx="2" fill="#39ff88"/>
+
+      <line x1="700" y1="560" x2="700" y2="630" stroke="#1c222c"/>
+
+      <text x="790" y="575" font-size="11" fill="#7b8794" text-anchor="middle">FOLLOWING</text>
+      <text x="790" y="605" font-size="26" font-weight="700" fill="#e6edf3" text-anchor="middle">9</text>
+      <rect x="725" y="618" width="130" height="4" rx="2" fill="#1c222c"/>
+      <rect x="725" y="618" width="40" height="4" rx="2" fill="#39ff88"/>
+    </g>
+  </g>
+</svg>
